@@ -26,7 +26,7 @@ st.markdown("""
 # Load Data
 @st.cache_data
 def load_data():
-    df = pd.read_csv(zomato.csv")
+    df = pd.read_csv("zomato.csv")
     df['approx_cost'] = df['approx_cost'].replace('[,]', '', regex=True).astype('int64')
     return df
 
