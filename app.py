@@ -3,9 +3,9 @@ import pandas as pd
 import plotly.express as px
 
 # ------------------ PAGE CONFIG ------------------
-st.set_page_config(page_title="Zomato Analytics", layout="wide")
+st.set_page_config(page_title="Zomato Dashboard", layout="wide")
 
-# ------------------ CUSTOM DARK CSS ------------------
+# ------------------ DARK THEME ------------------
 st.markdown("""
 <style>
 body {
@@ -13,14 +13,10 @@ body {
     color: white;
 }
 .metric-card {
-    background: linear-gradient(145deg, #1c1f26, #111);
+    background: #1c1f26;
     padding: 20px;
-    border-radius: 15px;
+    border-radius: 12px;
     text-align: center;
-    box-shadow: 0px 0px 15px rgba(255,255,255,0.05);
-}
-h1, h2, h3 {
-    color: #ffffff;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -39,97 +35,46 @@ def load_data():
 
 df = load_data()
 
-# ------------------ TITLE ------------------
-st.title("🍽️ Zomato Analytics Dashboard")
-
-# ------------------ SIDEBAR FILTER ------------------
-st.sidebar.header("🔎 Filter Panel")
-
-location = st.sidebar.selectbox("Select Location", df['location'].dropna().unique())
-restaurant = st.sidebar.selectbox("Select Restaurant", df['name'].dropna().unique())
+# ------------------ SIDEBAR ------------------
+st.sidebar.header("🔎 Filters")
+location = st.sidebar.selectbox("Location", df['location'].dropna().unique())
 
 filtered_df = df[df['location'] == location]
 
-# ------------------ KPIs ------------------
-col1, col2, col3, col4 = st.columns(4)
+# ------------------ TITLE ------------------
+st.title("🍽️ Zomato Dashboard")
 
-col1.markdown(f"""
-<div class="metric-card">
-<h3>⭐ Rating</h3>
-<h2>{round(filtered_df['rating'].mean(),2)}</h2>
-</div>
-""", unsafe_allow_html=True)
+# ------------------ KPI ROW ------------------
+c1, c2, c3, c4 = st.columns(4)
 
-col2.markdown(f"""
-<div class="metric-card">
-<h3>🗳️ Total Votes</h3>
-<h2>{int(filtered_df['votes'].sum())}</h2>
-</div>
-""", unsafe_allow_html=True)
+c1.markdown(f"<div class='metric-card'><h4>⭐ Rating</h4><h2>{round(filtered_df['rating'].mean(),2)}</h2></div>", unsafe_allow_html=True)
+c2.markdown(f"<div class='metric-card'><h4>🗳 Votes</h4><h2>{int(filtered_df['votes'].sum())}</h2></div>", unsafe_allow_html=True)
+c3.markdown(f"<div class='metric-card'><h4>💰 Avg Cost</h4><h2>{int(filtered_df['approx_cost'].mean())}</h2></div>", unsafe_allow_html=True)
+c4.markdown(f"<div class='metric-card'><h4>🏪 Restaurants</h4><h2>{filtered_df.shape[0]}</h2></div>", unsafe_allow_html=True)
 
-col3.markdown(f"""
-<div class="metric-card">
-<h3>💰 Avg Cost</h3>
-<h2>{int(filtered_df['approx_cost'].mean())}</h2>
-</div>
-""", unsafe_allow_html=True)
+# ------------------ SECOND KPI ROW ------------------
+c5, c6 = st.columns(2)
 
-col4.markdown(f"""
-<div class="metric-card">
-<h3>🏪 Restaurants</h3>
-<h2>{filtered_df.shape[0]}</h2>
-</div>
-""", unsafe_allow_html=True)
+c5.markdown(f"<div class='metric-card'><h4>📍 Avg Location Cost</h4><h2>{int(filtered_df['approx_cost'].mean())}</h2></div>", unsafe_allow_html=True)
+c6.markdown(f"<div class='metric-card'><h4>📊 Avg Location Rating</h4><h2>{round(filtered_df['rating'].mean(),2)}</h2></div>", unsafe_allow_html=True)
 
-# ------------------ EXTRA KPIs ------------------
-col5, col6 = st.columns(2)
+# ------------------ CHARTS SIDE BY SIDE ------------------
+col1, col2 = st.columns(2)
 
-col5.markdown(f"""
-<div class="metric-card">
-<h3>📍 Avg Location Cost</h3>
-<h2>{int(filtered_df['approx_cost'].mean())}</h2>
-</div>
-""", unsafe_allow_html=True)
+# Chart 1
+with col1:
+    st.subheader("📍 Location Cost")
+    loc_cost = df.groupby('location')['approx_cost'].mean().sort_values(ascending=False).head(10)
+    fig1 = px.bar(x=loc_cost.index, y=loc_cost.values, template="plotly_dark")
+    st.plotly_chart(fig1, use_container_width=True)
 
-col6.markdown(f"""
-<div class="metric-card">
-<h3>📊 Avg Location Rating</h3>
-<h2>{round(filtered_df['rating'].mean(),2)}</h2>
-</div>
-""", unsafe_allow_html=True)
-
-# ------------------ CHART 1 (LOCATION COST) ------------------
-st.subheader("📍 Expensive Locations")
-
-loc_cost = df.groupby('location')['approx_cost'].mean().sort_values(ascending=False).head(10)
-
-fig1 = px.bar(
-    x=loc_cost.index,
-    y=loc_cost.values,
-    labels={'x':'Location', 'y':'Avg Cost'},
-    template='plotly_dark'
-)
-
-st.plotly_chart(fig1, use_container_width=True)
-
-# ------------------ CHART 2 (RESTAURANT COST) ------------------
-st.subheader("🏨 Restaurant Cost Analysis")
-
-rest_cost = df.groupby('name')['approx_cost'].mean().sort_values(ascending=False).head(10)
-
-fig2 = px.bar(
-    x=rest_cost.index,
-    y=rest_cost.values,
-    labels={'x':'Restaurant', 'y':'Avg Cost'},
-    template='plotly_dark'
-)
-
-st.plotly_chart(fig2, use_container_width=True)
+# Chart 2
+with col2:
+    st.subheader("🏨 Restaurant Cost")
+    rest_cost = df.groupby('name')['approx_cost'].mean().sort_values(ascending=False).head(10)
+    fig2 = px.bar(x=rest_cost.index, y=rest_cost.values, template="plotly_dark")
+    st.plotly_chart(fig2, use_container_width=True)
 
 # ------------------ TABLE ------------------
-st.subheader("📋 Filtered Data")
+st.subheader("📋 Data")
 st.dataframe(filtered_df.head(20))
-
-# ------------------ FOOTER ------------------
-st.markdown("---")
-st.markdown("Made with ❤️ by Atharv")
