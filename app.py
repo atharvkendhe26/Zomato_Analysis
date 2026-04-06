@@ -1,89 +1,135 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+import plotly.express as px
 
-# Page Config
-st.set_page_config(page_title="Zomato Dashboard", layout="wide")
+# ------------------ PAGE CONFIG ------------------
+st.set_page_config(page_title="Zomato Analytics", layout="wide")
 
-# Custom Dark Theme Styling
+# ------------------ CUSTOM DARK CSS ------------------
 st.markdown("""
-    <style>
-    body {
-        background-color: #0e1117;
-        color: white;
-    }
-    .metric-card {
-        background-color: #1c1f26;
-        padding: 20px;
-        border-radius: 12px;
-        text-align: center;
-        box-shadow: 0px 0px 10px rgba(255,255,255,0.1);
-    }
-    </style>
+<style>
+body {
+    background-color: #0e1117;
+    color: white;
+}
+.metric-card {
+    background: linear-gradient(145deg, #1c1f26, #111);
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0px 0px 15px rgba(255,255,255,0.05);
+}
+h1, h2, h3 {
+    color: #ffffff;
+}
+</style>
 """, unsafe_allow_html=True)
 
-# Load Data
+# ------------------ LOAD DATA ------------------
 @st.cache_data
 def load_data():
     df = pd.read_csv("Zomato_Data.csv")
-    df['approx_cost'] = df['approx_cost'].replace('[,]', '', regex=True).astype('int64')
+    df['approx_cost'] = df['approx_cost'].replace('[,]', '', regex=True).astype(int)
+    
+    df['rating'] = df['rate'].astype(str).str.split('/').str[0]
+    df = df[df['rating'] != 'NEW']
+    df['rating'] = df['rating'].astype(float)
+
     return df
 
 df = load_data()
 
-# Title
-st.title("🍽️ Zomato Data Analysis Dashboard")
+# ------------------ TITLE ------------------
+st.title("🍽️ Zomato Analytics Dashboard")
 
-# KPIs
+# ------------------ SIDEBAR FILTER ------------------
+st.sidebar.header("🔎 Filter Panel")
+
+location = st.sidebar.selectbox("Select Location", df['location'].dropna().unique())
+restaurant = st.sidebar.selectbox("Select Restaurant", df['name'].dropna().unique())
+
+filtered_df = df[df['location'] == location]
+
+# ------------------ KPIs ------------------
 col1, col2, col3, col4 = st.columns(4)
 
-col1.metric("⭐ Avg Rating", round(df['rate'].astype(str).str.split('/').str[0].astype(float).mean(),2))
-col2.metric("🗳️ Total Votes", int(df['votes'].sum()))
-col3.metric("💰 Avg Cost", int(df['approx_cost'].mean()))
-col4.metric("🏪 Total Restaurants", df.shape[0])
+col1.markdown(f"""
+<div class="metric-card">
+<h3>⭐ Rating</h3>
+<h2>{round(filtered_df['rating'].mean(),2)}</h2>
+</div>
+""", unsafe_allow_html=True)
 
-# Location-wise Analysis
-st.subheader("📍 Location-wise Avg Cost")
+col2.markdown(f"""
+<div class="metric-card">
+<h3>🗳️ Total Votes</h3>
+<h2>{int(filtered_df['votes'].sum())}</h2>
+</div>
+""", unsafe_allow_html=True)
+
+col3.markdown(f"""
+<div class="metric-card">
+<h3>💰 Avg Cost</h3>
+<h2>{int(filtered_df['approx_cost'].mean())}</h2>
+</div>
+""", unsafe_allow_html=True)
+
+col4.markdown(f"""
+<div class="metric-card">
+<h3>🏪 Restaurants</h3>
+<h2>{filtered_df.shape[0]}</h2>
+</div>
+""", unsafe_allow_html=True)
+
+# ------------------ EXTRA KPIs ------------------
+col5, col6 = st.columns(2)
+
+col5.markdown(f"""
+<div class="metric-card">
+<h3>📍 Avg Location Cost</h3>
+<h2>{int(filtered_df['approx_cost'].mean())}</h2>
+</div>
+""", unsafe_allow_html=True)
+
+col6.markdown(f"""
+<div class="metric-card">
+<h3>📊 Avg Location Rating</h3>
+<h2>{round(filtered_df['rating'].mean(),2)}</h2>
+</div>
+""", unsafe_allow_html=True)
+
+# ------------------ CHART 1 (LOCATION COST) ------------------
+st.subheader("📍 Expensive Locations")
+
 loc_cost = df.groupby('location')['approx_cost'].mean().sort_values(ascending=False).head(10)
 
-fig1, ax1 = plt.subplots()
-sns.barplot(x=loc_cost.values, y=loc_cost.index, ax=ax1)
-ax1.set_title("Top Locations by Avg Cost")
-st.pyplot(fig1)
+fig1 = px.bar(
+    x=loc_cost.index,
+    y=loc_cost.values,
+    labels={'x':'Location', 'y':'Avg Cost'},
+    template='plotly_dark'
+)
 
-# Location-wise Rating
-st.subheader("📊 Location-wise Avg Rating")
-df['rating'] = df['rate'].astype(str).str.split('/').str[0]
-df = df[df['rating'] != 'NEW']
-df['rating'] = df['rating'].astype(float)
+st.plotly_chart(fig1, use_container_width=True)
 
-loc_rating = df.groupby('location')['rating'].mean().sort_values(ascending=False).head(10)
+# ------------------ CHART 2 (RESTAURANT COST) ------------------
+st.subheader("🏨 Restaurant Cost Analysis")
 
-fig2, ax2 = plt.subplots()
-sns.barplot(x=loc_rating.values, y=loc_rating.index, ax=ax2)
-ax2.set_title("Top Locations by Rating")
-st.pyplot(fig2)
-
-# Restaurant-wise Cost
-st.subheader("🏨 Restaurant-wise Avg Cost")
 rest_cost = df.groupby('name')['approx_cost'].mean().sort_values(ascending=False).head(10)
 
-fig3, ax3 = plt.subplots()
-sns.barplot(x=rest_cost.values, y=rest_cost.index, ax=ax3)
-ax3.set_title("Top Restaurants by Cost")
-st.pyplot(fig3)
+fig2 = px.bar(
+    x=rest_cost.index,
+    y=rest_cost.values,
+    labels={'x':'Restaurant', 'y':'Avg Cost'},
+    template='plotly_dark'
+)
 
-# Filters
-st.sidebar.header("🔍 Filters")
-selected_location = st.sidebar.selectbox("Select Location", df['location'].dropna().unique())
+st.plotly_chart(fig2, use_container_width=True)
 
-filtered_df = df[df['location'] == selected_location]
+# ------------------ TABLE ------------------
+st.subheader("📋 Filtered Data")
+st.dataframe(filtered_df.head(20))
 
-st.subheader(f"📌 Data for {selected_location}")
-st.dataframe(filtered_df.head(50))
-
-# Footer
+# ------------------ FOOTER ------------------
 st.markdown("---")
-st.markdown("Made with ❤️ using Streamlit")
-
+st.markdown("Made with ❤️ by Atharv")
