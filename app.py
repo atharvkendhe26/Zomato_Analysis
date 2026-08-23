@@ -4,11 +4,11 @@ import plotly.express as px
 
 
 # =========================================================
-# PAGE CONFIGURATION
+# PAGE CONFIG
 # =========================================================
 
 st.set_page_config(
-    page_title="Zomato Analytics Dashboard",
+    page_title="Zomato Analytics",
     page_icon="🍽️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -23,83 +23,50 @@ st.markdown(
     """
     <style>
 
-    /* Main App */
+    /* Main background */
     .stApp {
-        background-color: #0b0f14;
-        color: white;
+        background-color: #0e1117;
     }
 
     /* Sidebar */
     section[data-testid="stSidebar"] {
-        background-color: #11161d;
+        background-color: #151922;
     }
 
-    /* KPI Cards */
-    .kpi-card {
-        background: linear-gradient(
-            135deg,
-            #1c222b,
-            #12171d
-        );
-
-        border: 1px solid #303640;
-        border-radius: 15px;
-
-        padding: 20px;
-
-        text-align: center;
-
-        box-shadow: 0px 5px 18px rgba(0, 0, 0, 0.30);
-
-        min-height: 130px;
+    /* Metric cards */
+    [data-testid="stMetric"] {
+        background-color: #191e27;
+        border: 1px solid #2d3440;
+        padding: 18px;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     }
 
-    .kpi-icon {
-        font-size: 25px;
+    [data-testid="stMetricLabel"] {
+        color: #aeb6c2;
     }
 
-    .kpi-title {
-        color: #a7adb7;
-        font-size: 14px;
-        margin-top: 5px;
+    [data-testid="stMetricValue"] {
+        color: #ffffff;
     }
 
-    .kpi-value {
-        color: white;
-        font-size: 28px;
-        font-weight: 700;
-        margin-top: 5px;
+    /* Headers */
+    h1 {
+        color: #e23744 !important;
     }
 
-    /* Section Titles */
-    .section-title {
-        color: white;
-        font-size: 21px;
-        font-weight: 700;
-        margin-top: 20px;
-        margin-bottom: 12px;
+    h2, h3 {
+        color: #ffffff !important;
     }
 
-    /* Information Box */
-    .info-box {
-        background-color: #151b23;
-        border-left: 4px solid #e23744;
-
-        padding: 15px;
-
+    /* Buttons */
+    .stButton > button {
         border-radius: 8px;
-
-        color: #d7dbe0;
-
-        margin-bottom: 20px;
     }
 
-    /* Footer */
-    .footer {
-        text-align: center;
-        color: #777f8a;
-        padding: 25px;
-        font-size: 14px;
+    /* Divider */
+    hr {
+        border-color: #303640;
     }
 
     </style>
@@ -116,32 +83,23 @@ st.markdown(
 def load_data():
 
     try:
-
         df = pd.read_csv("Zomato_Data.csv")
 
     except FileNotFoundError:
-
         st.error(
             "❌ Zomato_Data.csv file nahi mili. "
-            "CSV file ko app.py ke same folder mein rakho."
+            "CSV ko app.py ke same folder mein rakho."
         )
-
         st.stop()
 
-    # -----------------------------------------------------
     # Clean column names
-    # -----------------------------------------------------
-
     df.columns = (
         df.columns
         .str.strip()
         .str.lower()
     )
 
-    # -----------------------------------------------------
-    # Check important columns
-    # -----------------------------------------------------
-
+    # Required columns
     required_columns = [
         "name",
         "location",
@@ -150,25 +108,26 @@ def load_data():
         "approx_cost"
     ]
 
-    missing_columns = [
-        column
-        for column in required_columns
-        if column not in df.columns
+    missing = [
+        col for col in required_columns
+        if col not in df.columns
     ]
 
-    if missing_columns:
-
+    if missing:
         st.error(
-            "❌ CSV mein ye columns missing hain: "
-            + ", ".join(missing_columns)
+            "❌ CSV mein required columns missing hain:"
         )
+        st.write(missing)
 
-        st.write("Available columns:", list(df.columns))
+        st.info(
+            "Available columns:"
+        )
+        st.write(list(df.columns))
 
         st.stop()
 
     # -----------------------------------------------------
-    # Clean Restaurant Name
+    # NAME
     # -----------------------------------------------------
 
     df["name"] = (
@@ -178,7 +137,7 @@ def load_data():
     )
 
     # -----------------------------------------------------
-    # Clean Location
+    # LOCATION
     # -----------------------------------------------------
 
     df["location"] = (
@@ -188,7 +147,7 @@ def load_data():
     )
 
     # -----------------------------------------------------
-    # Clean Cost
+    # COST
     # -----------------------------------------------------
 
     df["approx_cost"] = (
@@ -204,7 +163,7 @@ def load_data():
     )
 
     # -----------------------------------------------------
-    # Clean Votes
+    # VOTES
     # -----------------------------------------------------
 
     df["votes"] = pd.to_numeric(
@@ -215,17 +174,16 @@ def load_data():
     df["votes"] = df["votes"].fillna(0)
 
     # -----------------------------------------------------
-    # Extract Numeric Rating
-    # Example:
-    # 4.1/5 -> 4.1
-    # NEW   -> NaN
-    # -     -> NaN
+    # RATING
     # -----------------------------------------------------
 
     df["rating"] = (
         df["rate"]
         .astype(str)
-        .str.extract(r"(\d+(?:\.\d+)?)", expand=False)
+        .str.extract(
+            r"(\d+(?:\.\d+)?)",
+            expand=False
+        )
     )
 
     df["rating"] = pd.to_numeric(
@@ -234,7 +192,7 @@ def load_data():
     )
 
     # -----------------------------------------------------
-    # Remove invalid records
+    # REMOVE INVALID DATA
     # -----------------------------------------------------
 
     df = df.dropna(
@@ -246,19 +204,13 @@ def load_data():
         ]
     )
 
-    # -----------------------------------------------------
-    # Rating range validation
-    # -----------------------------------------------------
-
+    # Valid rating
     df = df[
         (df["rating"] >= 0) &
         (df["rating"] <= 5)
     ]
 
-    # -----------------------------------------------------
-    # Cost validation
-    # -----------------------------------------------------
-
+    # Valid cost
     df = df[
         df["approx_cost"] >= 0
     ]
@@ -273,18 +225,17 @@ df = load_data()
 # SIDEBAR
 # =========================================================
 
+st.sidebar.title("🔎 Dashboard Filters")
+
 st.sidebar.markdown(
-    """
-    <h2 style="color:#e23744;">
-        🔎 Dashboard Filters
-    </h2>
-    """,
-    unsafe_allow_html=True
+    "Use filters to explore restaurant data."
 )
+
+st.sidebar.divider()
 
 
 # ---------------------------------------------------------
-# Location Filter
+# LOCATION
 # ---------------------------------------------------------
 
 locations = sorted(
@@ -295,13 +246,13 @@ locations = sorted(
 )
 
 selected_location = st.sidebar.selectbox(
-    "📍 Select Location",
+    "📍 Location",
     ["All Locations"] + locations
 )
 
 
 # ---------------------------------------------------------
-# Rating Filter
+# RATING
 # ---------------------------------------------------------
 
 min_rating = st.sidebar.slider(
@@ -314,30 +265,78 @@ min_rating = st.sidebar.slider(
 
 
 # ---------------------------------------------------------
-# Cost Filter
+# COST
 # ---------------------------------------------------------
 
-max_dataset_cost = int(
+max_cost_data = int(
     df["approx_cost"].max()
 )
 
 selected_max_cost = st.sidebar.slider(
     "💰 Maximum Cost",
     min_value=0,
-    max_value=max_dataset_cost,
-    value=max_dataset_cost,
+    max_value=max_cost_data,
+    value=max_cost_data,
     step=100
 )
 
 
+# ---------------------------------------------------------
+# OPTIONAL ONLINE ORDER FILTER
+# ---------------------------------------------------------
+
+if "online_order" in df.columns:
+
+    online_options = sorted(
+        df["online_order"]
+        .dropna()
+        .astype(str)
+        .unique()
+        .tolist()
+    )
+
+    selected_online_order = st.sidebar.selectbox(
+        "🛵 Online Order",
+        ["All"] + online_options
+    )
+
+else:
+
+    selected_online_order = "All"
+
+
+# ---------------------------------------------------------
+# OPTIONAL BOOK TABLE FILTER
+# ---------------------------------------------------------
+
+if "book_table" in df.columns:
+
+    table_options = sorted(
+        df["book_table"]
+        .dropna()
+        .astype(str)
+        .unique()
+        .tolist()
+    )
+
+    selected_book_table = st.sidebar.selectbox(
+        "🍽️ Table Booking",
+        ["All"] + table_options
+    )
+
+else:
+
+    selected_book_table = "All"
+
+
 # =========================================================
-# FILTER DATA
+# APPLY FILTERS
 # =========================================================
 
 filtered_df = df.copy()
 
 
-# Location filter
+# Location
 
 if selected_location != "All Locations":
 
@@ -346,53 +345,60 @@ if selected_location != "All Locations":
     ]
 
 
-# Rating filter
+# Rating
 
 filtered_df = filtered_df[
     filtered_df["rating"] >= min_rating
 ]
 
 
-# Cost filter
+# Cost
 
 filtered_df = filtered_df[
     filtered_df["approx_cost"] <= selected_max_cost
 ]
 
 
+# Online order
+
+if (
+    "online_order" in filtered_df.columns
+    and selected_online_order != "All"
+):
+
+    filtered_df = filtered_df[
+        filtered_df["online_order"]
+        .astype(str)
+        == selected_online_order
+    ]
+
+
+# Table booking
+
+if (
+    "book_table" in filtered_df.columns
+    and selected_book_table != "All"
+):
+
+    filtered_df = filtered_df[
+        filtered_df["book_table"]
+        .astype(str)
+        == selected_book_table
+    ]
+
+
 # =========================================================
 # HEADER
 # =========================================================
 
-st.markdown(
-    """
-    <h1 style="
-        text-align:center;
-        color:#e23744;
-        font-size:42px;
-        margin-bottom:0px;
-    ">
-        🍽️ Zomato Restaurant Analytics
-    </h1>
-    """,
-    unsafe_allow_html=True
+st.title("🍽️ Zomato Restaurant Analytics")
+
+st.caption(
+    "Interactive analysis of restaurant ratings, pricing, "
+    "popularity and customer behaviour"
 )
 
-st.markdown(
-    """
-    <p style="
-        text-align:center;
-        color:#9da4ae;
-        font-size:16px;
-        margin-top:5px;
-    ">
-        Restaurant Ratings • Pricing • Popularity • Customer Analysis
-    </p>
-    """,
-    unsafe_allow_html=True
-)
-
-st.markdown("---")
+st.divider()
 
 
 # =========================================================
@@ -402,8 +408,11 @@ st.markdown("---")
 if filtered_df.empty:
 
     st.warning(
-        "⚠️ Current filters ke according koi data available nahi hai. "
-        "Please filters ko change karo."
+        "⚠️ Current filters ke according koi restaurant data nahi mila."
+    )
+
+    st.info(
+        "Please Rating, Cost ya Location filter ko change karein."
     )
 
     st.stop()
@@ -423,340 +432,156 @@ average_cost = filtered_df["approx_cost"].mean()
 
 
 # =========================================================
-# KPI CARDS
+# KPI ROW
 # =========================================================
 
-kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+st.subheader("📊 Key Performance Indicators")
+
+k1, k2, k3, k4 = st.columns(4)
 
 
-with kpi1:
-
-    st.markdown(
-        f"""
-        <div class="kpi-card">
-
-            <div class="kpi-icon">
-                🏪
-            </div>
-
-            <div class="kpi-title">
-                Total Restaurants
-            </div>
-
-            <div class="kpi-value">
-                {total_restaurants:,}
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
+with k1:
+    st.metric(
+        label="🏪 Restaurants",
+        value=f"{total_restaurants:,}"
     )
 
 
-with kpi2:
-
-    st.markdown(
-        f"""
-        <div class="kpi-card">
-
-            <div class="kpi-icon">
-                ⭐
-            </div>
-
-            <div class="kpi-title">
-                Average Rating
-            </div>
-
-            <div class="kpi-value">
-                {average_rating:.2f}
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
+with k2:
+    st.metric(
+        label="⭐ Average Rating",
+        value=f"{average_rating:.2f} / 5"
     )
 
 
-with kpi3:
-
-    st.markdown(
-        f"""
-        <div class="kpi-card">
-
-            <div class="kpi-icon">
-                🗳️
-            </div>
-
-            <div class="kpi-title">
-                Total Votes
-            </div>
-
-            <div class="kpi-value">
-                {int(total_votes):,}
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
+with k3:
+    st.metric(
+        label="🗳️ Total Votes",
+        value=f"{int(total_votes):,}"
     )
 
 
-with kpi4:
-
-    st.markdown(
-        f"""
-        <div class="kpi-card">
-
-            <div class="kpi-icon">
-                💰
-            </div>
-
-            <div class="kpi-title">
-                Average Cost
-            </div>
-
-            <div class="kpi-value">
-                ₹{average_cost:,.0f}
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
+with k4:
+    st.metric(
+        label="💰 Average Cost",
+        value=f"₹{average_cost:,.0f}"
     )
 
 
-st.markdown("<br>", unsafe_allow_html=True)
+st.write("")
 
 
 # =========================================================
-# FILTER SUMMARY
+# FILTER STATUS
 # =========================================================
 
-st.markdown(
-    """
-    <div class="section-title">
-        📊 Analysis Overview
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-st.markdown(
-    f"""
-    <div class="info-box">
-
-        <b>📍 Location:</b>
-        {selected_location}
-
-        &nbsp;&nbsp; | &nbsp;&nbsp;
-
-        <b>⭐ Minimum Rating:</b>
-        {min_rating}
-
-        &nbsp;&nbsp; | &nbsp;&nbsp;
-
-        <b>💰 Maximum Cost:</b>
-        ₹{selected_max_cost:,}
-
-        &nbsp;&nbsp; | &nbsp;&nbsp;
-
-        <b>🏪 Records:</b>
-        {len(filtered_df):,}
-
-    </div>
-    """,
-    unsafe_allow_html=True
+st.info(
+    f"📍 **Location:** {selected_location}  |  "
+    f"⭐ **Rating:** {min_rating}+  |  "
+    f"💰 **Max Cost:** ₹{selected_max_cost:,}  |  "
+    f"📊 **Records:** {len(filtered_df):,}"
 )
 
 
 # =========================================================
-# CHART 1 + CHART 2
+# TABS
 # =========================================================
 
-chart1, chart2 = st.columns(2)
+tab1, tab2, tab3 = st.tabs(
+    [
+        "📈 Overview",
+        "🏆 Restaurant Analysis",
+        "📋 Data Explorer"
+    ]
+)
 
 
 # =========================================================
-# AVERAGE COST BY LOCATION
+# TAB 1 - OVERVIEW
 # =========================================================
 
-with chart1:
+with tab1:
 
-    st.markdown(
-        """
-        <div class="section-title">
-            📍 Average Cost by Location
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.subheader("📈 Business Overview")
 
-    location_cost = (
-        filtered_df
-        .groupby("location")["approx_cost"]
-        .mean()
-        .sort_values(ascending=False)
-        .head(10)
-        .reset_index()
-    )
+    col1, col2 = st.columns(2)
 
-    fig_location = px.bar(
-        location_cost,
-        x="approx_cost",
-        y="location",
-        orientation="h",
-        color="approx_cost",
-        color_continuous_scale="Reds",
-        template="plotly_dark",
-        labels={
-            "approx_cost": "Average Cost (₹)",
-            "location": "Location"
-        }
-    )
+    # -----------------------------------------------------
+    # LOCATION COST
+    # -----------------------------------------------------
 
-    fig_location.update_layout(
-        height=450,
-        showlegend=False,
-        coloraxis_showscale=False,
-        plot_bgcolor="#0b0f14",
-        paper_bgcolor="#0b0f14",
-        margin=dict(
-            l=10,
-            r=10,
-            t=20,
-            b=20
+    with col1:
+
+        location_cost = (
+            filtered_df
+            .groupby("location")["approx_cost"]
+            .mean()
+            .sort_values(ascending=False)
+            .head(10)
+            .reset_index()
         )
-    )
 
-    st.plotly_chart(
-        fig_location,
-        use_container_width=True
-    )
-
-
-# =========================================================
-# RATING DISTRIBUTION
-# =========================================================
-
-with chart2:
-
-    st.markdown(
-        """
-        <div class="section-title">
-            ⭐ Rating Distribution
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    fig_rating = px.histogram(
-        filtered_df,
-        x="rating",
-        nbins=15,
-        color_discrete_sequence=["#e23744"],
-        template="plotly_dark",
-        labels={
-            "rating": "Rating"
-        }
-    )
-
-    fig_rating.update_layout(
-        height=450,
-        plot_bgcolor="#0b0f14",
-        paper_bgcolor="#0b0f14",
-        margin=dict(
-            l=10,
-            r=10,
-            t=20,
-            b=20
+        fig1 = px.bar(
+            location_cost,
+            x="approx_cost",
+            y="location",
+            orientation="h",
+            color="approx_cost",
+            color_continuous_scale="Reds",
+            template="plotly_dark",
+            title="💰 Top 10 Locations by Average Cost",
+            labels={
+                "approx_cost": "Average Cost (₹)",
+                "location": "Location"
+            }
         )
-    )
 
-    st.plotly_chart(
-        fig_rating,
-        use_container_width=True
-    )
-
-
-# =========================================================
-# CHART 3 + CHART 4
-# =========================================================
-
-chart3, chart4 = st.columns(2)
-
-
-# =========================================================
-# MOST POPULAR RESTAURANTS
-# =========================================================
-
-with chart3:
-
-    st.markdown(
-        """
-        <div class="section-title">
-            🔥 Most Popular Restaurants
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    popular_restaurants = (
-        filtered_df
-        .groupby("name")["votes"]
-        .sum()
-        .sort_values(ascending=False)
-        .head(10)
-        .reset_index()
-    )
-
-    fig_votes = px.bar(
-        popular_restaurants,
-        x="votes",
-        y="name",
-        orientation="h",
-        color="votes",
-        color_continuous_scale="Oranges",
-        template="plotly_dark",
-        labels={
-            "votes": "Total Votes",
-            "name": "Restaurant"
-        }
-    )
-
-    fig_votes.update_layout(
-        height=450,
-        showlegend=False,
-        coloraxis_showscale=False,
-        plot_bgcolor="#0b0f14",
-        paper_bgcolor="#0b0f14",
-        margin=dict(
-            l=10,
-            r=10,
-            t=20,
-            b=20
+        fig1.update_layout(
+            height=450,
+            coloraxis_showscale=False,
+            plot_bgcolor="#0e1117",
+            paper_bgcolor="#0e1117"
         )
-    )
 
-    st.plotly_chart(
-        fig_votes,
-        use_container_width=True
-    )
+        st.plotly_chart(
+            fig1,
+            use_container_width=True
+        )
 
+    # -----------------------------------------------------
+    # RATING DISTRIBUTION
+    # -----------------------------------------------------
 
-# =========================================================
-# COST VS RATING
-# =========================================================
+    with col2:
 
-with chart4:
+        fig2 = px.histogram(
+            filtered_df,
+            x="rating",
+            nbins=15,
+            color_discrete_sequence=["#e23744"],
+            template="plotly_dark",
+            title="⭐ Restaurant Rating Distribution",
+            labels={
+                "rating": "Rating"
+            }
+        )
 
-    st.markdown(
-        """
-        <div class="section-title">
-            💰 Cost vs Rating
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+        fig2.update_layout(
+            height=450,
+            plot_bgcolor="#0e1117",
+            paper_bgcolor="#0e1117"
+        )
+
+        st.plotly_chart(
+            fig2,
+            use_container_width=True
+        )
+
+    # -----------------------------------------------------
+    # COST VS RATING
+    # -----------------------------------------------------
+
+    st.subheader("💰 Price vs Customer Rating")
 
     scatter_data = filtered_df[
         [
@@ -767,7 +592,7 @@ with chart4:
         ]
     ].copy()
 
-    fig_scatter = px.scatter(
+    fig3 = px.scatter(
         scatter_data,
         x="approx_cost",
         y="rating",
@@ -776,6 +601,7 @@ with chart4:
         hover_name="name",
         color_continuous_scale="RdYlGn",
         template="plotly_dark",
+        title="Relationship Between Restaurant Cost and Rating",
         labels={
             "approx_cost": "Approx Cost (₹)",
             "rating": "Rating",
@@ -783,122 +609,349 @@ with chart4:
         }
     )
 
-    fig_scatter.update_layout(
-        height=450,
-        plot_bgcolor="#0b0f14",
-        paper_bgcolor="#0b0f14",
-        margin=dict(
-            l=10,
-            r=10,
-            t=20,
-            b=20
-        )
+    fig3.update_layout(
+        height=500,
+        plot_bgcolor="#0e1117",
+        paper_bgcolor="#0e1117"
     )
 
     st.plotly_chart(
-        fig_scatter,
+        fig3,
         use_container_width=True
     )
 
 
 # =========================================================
-# TOP RATED RESTAURANTS
+# TAB 2 - RESTAURANT ANALYSIS
 # =========================================================
 
-st.markdown(
-    """
-    <div class="section-title">
-        🏆 Top Rated Restaurants
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+with tab2:
 
-top_rated = (
-    filtered_df[
-        [
-            "name",
-            "location",
-            "rating",
-            "votes",
-            "approx_cost"
-        ]
-    ]
-    .sort_values(
-        by=["rating", "votes"],
-        ascending=[False, False]
+    st.subheader("🏆 Restaurant Performance")
+
+    col3, col4 = st.columns(2)
+
+    # -----------------------------------------------------
+    # POPULAR RESTAURANTS
+    # -----------------------------------------------------
+
+    with col3:
+
+        popular = (
+            filtered_df
+            .groupby("name")["votes"]
+            .sum()
+            .sort_values(ascending=False)
+            .head(10)
+            .reset_index()
+        )
+
+        fig4 = px.bar(
+            popular,
+            x="votes",
+            y="name",
+            orientation="h",
+            color="votes",
+            color_continuous_scale="Oranges",
+            template="plotly_dark",
+            title="🔥 Top 10 Restaurants by Votes",
+            labels={
+                "votes": "Total Votes",
+                "name": "Restaurant"
+            }
+        )
+
+        fig4.update_layout(
+            height=500,
+            coloraxis_showscale=False,
+            plot_bgcolor="#0e1117",
+            paper_bgcolor="#0e1117"
+        )
+
+        st.plotly_chart(
+            fig4,
+            use_container_width=True
+        )
+
+    # -----------------------------------------------------
+    # TOP RATED
+    # -----------------------------------------------------
+
+    with col4:
+
+        top_rated_chart = (
+            filtered_df
+            .groupby("name")
+            .agg(
+                rating=("rating", "mean"),
+                votes=("votes", "sum")
+            )
+            .sort_values(
+                ["rating", "votes"],
+                ascending=[False, False]
+            )
+            .head(10)
+            .reset_index()
+        )
+
+        fig5 = px.bar(
+            top_rated_chart,
+            x="rating",
+            y="name",
+            orientation="h",
+            color="rating",
+            color_continuous_scale="RdYlGn",
+            template="plotly_dark",
+            title="⭐ Top 10 Highest Rated Restaurants",
+            labels={
+                "rating": "Average Rating",
+                "name": "Restaurant"
+            }
+        )
+
+        fig5.update_layout(
+            height=500,
+            coloraxis_showscale=False,
+            plot_bgcolor="#0e1117",
+            paper_bgcolor="#0e1117",
+            xaxis=dict(
+                range=[0, 5]
+            )
+        )
+
+        st.plotly_chart(
+            fig5,
+            use_container_width=True
+        )
+
+    # -----------------------------------------------------
+    # BUSINESS INSIGHTS
+    # -----------------------------------------------------
+
+    st.subheader("💡 Business Insights")
+
+    best_rating_row = (
+        filtered_df
+        .sort_values(
+            ["rating", "votes"],
+            ascending=[False, False]
+        )
+        .iloc[0]
     )
-    .head(15)
-    .copy()
-)
 
+    most_voted_row = (
+        filtered_df
+        .sort_values(
+            "votes",
+            ascending=False
+        )
+        .iloc[0]
+    )
 
-# Rename columns for display
+    expensive_location = (
+        filtered_df
+        .groupby("location")["approx_cost"]
+        .mean()
+        .sort_values(ascending=False)
+    )
 
-top_rated = top_rated.rename(
-    columns={
-        "name": "Restaurant",
-        "location": "Location",
-        "rating": "Rating",
-        "votes": "Votes",
-        "approx_cost": "Approx Cost (₹)"
-    }
-)
+    if len(expensive_location) > 0:
+        expensive_location_name = expensive_location.index[0]
+        expensive_location_cost = expensive_location.iloc[0]
+    else:
+        expensive_location_name = "N/A"
+        expensive_location_cost = 0
 
+    insight1, insight2, insight3 = st.columns(3)
 
-st.dataframe(
-    top_rated,
-    use_container_width=True,
-    hide_index=True
-)
+    with insight1:
+
+        st.success(
+            f"⭐ **Highest Rated**\n\n"
+            f"{best_rating_row['name']}\n\n"
+            f"Rating: **{best_rating_row['rating']:.1f}/5**"
+        )
+
+    with insight2:
+
+        st.warning(
+            f"🔥 **Most Voted Restaurant**\n\n"
+            f"{most_voted_row['name']}\n\n"
+            f"Votes: **{int(most_voted_row['votes']):,}**"
+        )
+
+    with insight3:
+
+        st.info(
+            f"💰 **Costliest Location**\n\n"
+            f"{expensive_location_name}\n\n"
+            f"Avg Cost: **₹{expensive_location_cost:,.0f}**"
+        )
 
 
 # =========================================================
-# DATASET SUMMARY
+# TAB 3 - DATA EXPLORER
 # =========================================================
 
-st.markdown("---")
+with tab3:
 
-st.markdown(
-    """
-    <div class="section-title">
-        📁 Dataset Summary
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+    st.subheader("📋 Restaurant Data Explorer")
 
-summary1, summary2, summary3, summary4 = st.columns(4)
+    # -----------------------------------------------------
+    # SEARCH
+    # -----------------------------------------------------
+
+    search = st.text_input(
+        "🔍 Search Restaurant",
+        placeholder="Example: AB's, Cafe, Empire..."
+    )
+
+    display_df = filtered_df.copy()
+
+    if search:
+
+        display_df = display_df[
+            display_df["name"]
+            .str.contains(
+                search,
+                case=False,
+                na=False
+            )
+        ]
+
+    # -----------------------------------------------------
+    # SORT
+    # -----------------------------------------------------
+
+    sort_option = st.selectbox(
+        "Sort Data By",
+        [
+            "Rating - High to Low",
+            "Votes - High to Low",
+            "Cost - High to Low",
+            "Cost - Low to High"
+        ]
+    )
+
+    if sort_option == "Rating - High to Low":
+
+        display_df = display_df.sort_values(
+            "rating",
+            ascending=False
+        )
+
+    elif sort_option == "Votes - High to Low":
+
+        display_df = display_df.sort_values(
+            "votes",
+            ascending=False
+        )
+
+    elif sort_option == "Cost - High to Low":
+
+        display_df = display_df.sort_values(
+            "approx_cost",
+            ascending=False
+        )
+
+    else:
+
+        display_df = display_df.sort_values(
+            "approx_cost",
+            ascending=True
+        )
+
+    # -----------------------------------------------------
+    # DISPLAY COLUMNS
+    # -----------------------------------------------------
+
+    table_columns = [
+        "name",
+        "location",
+        "rating",
+        "votes",
+        "approx_cost"
+    ]
+
+    table_columns = [
+        col
+        for col in table_columns
+        if col in display_df.columns
+    ]
+
+    final_table = display_df[table_columns].copy()
+
+    final_table = final_table.rename(
+        columns={
+            "name": "Restaurant",
+            "location": "Location",
+            "rating": "Rating",
+            "votes": "Votes",
+            "approx_cost": "Approx Cost (₹)"
+        }
+    )
+
+    st.write(
+        f"Showing **{len(final_table):,}** restaurants"
+    )
+
+    st.dataframe(
+        final_table.head(100),
+        use_container_width=True,
+        hide_index=True
+    )
+
+    # -----------------------------------------------------
+    # DOWNLOAD
+    # -----------------------------------------------------
+
+    csv_data = final_table.to_csv(
+        index=False
+    ).encode("utf-8")
+
+    st.download_button(
+        label="⬇️ Download Filtered Data",
+        data=csv_data,
+        file_name="zomato_filtered_data.csv",
+        mime="text/csv"
+    )
 
 
-with summary1:
+# =========================================================
+# DATASET INFORMATION
+# =========================================================
+
+st.divider()
+
+st.subheader("📁 Dataset Information")
+
+d1, d2, d3, d4 = st.columns(4)
+
+with d1:
 
     st.metric(
-        "Dataset Rows",
+        "Total Dataset Rows",
         f"{len(df):,}"
     )
 
-
-with summary2:
+with d2:
 
     st.metric(
         "Unique Restaurants",
         f"{df['name'].nunique():,}"
     )
 
-
-with summary3:
+with d3:
 
     st.metric(
         "Unique Locations",
         f"{df['location'].nunique():,}"
     )
 
-
-with summary4:
+with d4:
 
     st.metric(
-        "Average Dataset Rating",
+        "Overall Avg Rating",
         f"{df['rating'].mean():.2f}"
     )
 
@@ -907,25 +960,13 @@ with summary4:
 # FOOTER
 # =========================================================
 
-st.markdown(
-    """
-    <div class="footer">
+st.divider()
 
-        🍽️ <b>Zomato Restaurant Analytics Dashboard</b>
+st.caption(
+    "🍽️ Zomato Restaurant Analytics | "
+    "Built with Python • Pandas • Plotly • Streamlit"
+)
 
-        <br><br>
-
-        Built with
-        <b>Python</b> •
-        <b>Pandas</b> •
-        <b>Plotly</b> •
-        <b>Streamlit</b>
-
-        <br><br>
-
-        Made with ❤️ by Atharv
-
-    </div>
-    """,
-    unsafe_allow_html=True
+st.caption(
+    "Made with ❤️ by Atharv"
 )
