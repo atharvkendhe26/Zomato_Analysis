@@ -16,15 +16,15 @@ st.set_page_config(
 
 
 # =========================================================
-# CUSTOM CSS
+# CSS
 # =========================================================
 
 st.markdown("""
 <style>
 
-/* ======================================================
-   MAIN PAGE
-   ====================================================== */
+/* =====================================================
+   GLOBAL
+   ===================================================== */
 
 .stApp {
     background: #0b0f14;
@@ -32,26 +32,26 @@ st.markdown("""
 
 .block-container {
     max-width: 100%;
-    padding-top: 0.45rem;
-    padding-bottom: 0.2rem;
-    padding-left: 1.1rem;
-    padding-right: 1.1rem;
+    padding-top: 0.25rem !important;
+    padding-bottom: 0rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
 }
 
 
-/* ======================================================
+/* =====================================================
    SIDEBAR
-   ====================================================== */
+   ===================================================== */
 
 section[data-testid="stSidebar"] {
-    background: #151a21;
+    background: #151a21 !important;
     border-right: 1px solid #303640;
 }
 
 section[data-testid="stSidebar"] > div {
-    padding-top: 1.1rem;
-    padding-left: 0.9rem;
-    padding-right: 0.9rem;
+    padding-top: 1rem !important;
+    padding-left: 0.9rem !important;
+    padding-right: 0.9rem !important;
 }
 
 
@@ -59,16 +59,16 @@ section[data-testid="stSidebar"] > div {
 
 section[data-testid="stSidebar"] h2 {
     color: #e23744 !important;
-    font-size: 21px !important;
+    font-size: 22px !important;
     font-weight: 800 !important;
-    margin-bottom: 4px !important;
+    margin-bottom: 3px !important;
 }
 
 
-/* Sidebar description */
+/* Sidebar text */
 
 section[data-testid="stSidebar"] p {
-    color: #aeb7c3 !important;
+    color: #9da7b4 !important;
     font-size: 12px !important;
 }
 
@@ -86,114 +86,152 @@ section[data-testid="stSidebar"] label {
 
 section[data-testid="stSidebar"]
 div[data-baseweb="select"] > div {
-    background-color: #0d1117 !important;
+
+    background-color: #0c1016 !important;
+
     border: 1px solid #353c47 !important;
+
     border-radius: 8px !important;
+
     min-height: 38px !important;
 }
 
 
-/* Slider */
+/* Sliders */
 
 section[data-testid="stSidebar"] .stSlider {
-    padding-top: 0px;
-    padding-bottom: 5px;
+    padding-top: 0 !important;
+    padding-bottom: 4px !important;
 }
 
 
-/* ======================================================
+/* =====================================================
    ZOMATO HEADER
-   ====================================================== */
+   ===================================================== */
 
 .zomato-title {
+
     text-align: center;
+
     color: #e23744;
-    font-size: 39px;
-    line-height: 1.05;
+
+    font-size: 34px;
+
+    line-height: 1;
+
     font-weight: 900;
-    letter-spacing: -1px;
-    margin-top: 0px;
-    margin-bottom: 2px;
+
+    letter-spacing: -0.8px;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
 }
+
 
 .zomato-subtitle {
+
     text-align: center;
-    color: #aeb7c3;
-    font-size: 12px;
+
+    color: #9da7b4;
+
+    font-size: 11px;
+
+    margin-top: 4px;
+
     margin-bottom: 5px;
 }
 
 
-/* ======================================================
+/* =====================================================
    DIVIDER
-   ====================================================== */
+   ===================================================== */
 
 hr {
+
     border-color: #303640 !important;
-    margin-top: 5px !important;
-    margin-bottom: 7px !important;
+
+    margin-top: 4px !important;
+
+    margin-bottom: 5px !important;
 }
 
 
-/* ======================================================
+/* =====================================================
    SECTION TITLE
-   ====================================================== */
+   ===================================================== */
 
 .section-title {
+
     color: #ffffff;
-    font-size: 17px;
+
+    font-size: 16px;
+
     font-weight: 800;
+
     margin-top: 3px;
-    margin-bottom: 5px;
+
+    margin-bottom: 4px;
 }
 
 
-/* ======================================================
+/* =====================================================
    KPI CARDS
-   ====================================================== */
+   ===================================================== */
 
 [data-testid="stMetric"] {
 
-    background: linear-gradient(
-        145deg,
-        #1b212a,
-        #151a21
-    );
+    background:
+        linear-gradient(
+            135deg,
+            #1c222b,
+            #151a21
+        );
 
     border: 1px solid #343c47;
 
-    border-radius: 11px;
+    border-radius: 10px;
 
-    padding: 8px 12px;
+    padding: 7px 12px !important;
 
-    min-height: 68px;
+    min-height: 61px !important;
+
+    height: 61px !important;
 
     box-shadow:
-        0 4px 10px rgba(0,0,0,0.22);
+        0 3px 8px rgba(0,0,0,0.25);
 }
 
 
 /* KPI label */
 
 [data-testid="stMetricLabel"] {
+
     color: #aeb7c3 !important;
-    font-size: 11px !important;
-    font-weight: 600 !important;
+
+    font-size: 10px !important;
+
+    line-height: 1 !important;
 }
 
 
 /* KPI value */
 
 [data-testid="stMetricValue"] {
+
     color: #ffffff !important;
-    font-size: 22px !important;
+
+    font-size: 21px !important;
+
     font-weight: 800 !important;
+
+    line-height: 1.1 !important;
 }
 
 
-/* ======================================================
-   CHART CONTAINER
-   ====================================================== */
+/* =====================================================
+   PLOTLY CHART
+   ===================================================== */
 
 div[data-testid="stPlotlyChart"] {
 
@@ -201,42 +239,52 @@ div[data-testid="stPlotlyChart"] {
 
     border: 1px solid #2c343f;
 
-    border-radius: 10px;
+    border-radius: 9px;
 
-    padding: 2px;
+    padding: 0 !important;
 
-    margin-bottom: 5px;
+    margin: 0 !important;
+
 }
 
 
-/* ======================================================
-   SMALL TEXT
-   ====================================================== */
+/* =====================================================
+   COLUMNS
+   ===================================================== */
 
-.small-info {
+div[data-testid="column"] {
+
+    padding-left: 3px !important;
+
+    padding-right: 3px !important;
+
+}
+
+
+/* =====================================================
+   FILTER SUMMARY
+   ===================================================== */
+
+.filter-summary {
+
     text-align: center;
-    color: #8993a1;
-    font-size: 10px;
-    margin-top: 1px;
+
+    color: #7f8997;
+
+    font-size: 9px;
+
+    margin-top: 2px;
+
+    margin-bottom: 2px;
 }
 
 
-/* ======================================================
-   HIDE FOOTER
-   ====================================================== */
+/* =====================================================
+   FOOTER
+   ===================================================== */
 
 footer {
     visibility: hidden;
-}
-
-
-/* ======================================================
-   REDUCE COLUMN GAP
-   ====================================================== */
-
-div[data-testid="column"] {
-    padding-left: 3px !important;
-    padding-right: 3px !important;
 }
 
 </style>
@@ -250,30 +298,16 @@ div[data-testid="column"] {
 @st.cache_data
 def load_data():
 
-    try:
-        df = pd.read_csv("Zomato_Data.csv")
-
-    except FileNotFoundError:
-
-        st.error(
-            "❌ Zomato_Data.csv nahi mili. "
-            "CSV ko app.py ke same folder mein rakho."
-        )
-
-        st.stop()
-
+    df = pd.read_csv("Zomato_Data.csv")
 
     # Clean column names
-
     df.columns = (
         df.columns
         .str.strip()
         .str.lower()
     )
 
-
-    # Required columns
-
+    # Check columns
     required = [
         "name",
         "location",
@@ -282,69 +316,50 @@ def load_data():
         "approx_cost"
     ]
 
-
     missing = [
         c for c in required
         if c not in df.columns
     ]
 
-
     if missing:
-
         st.error(
-            "❌ Required columns missing hain:"
+            f"Missing columns: {missing}"
         )
-
-        st.write(missing)
-
         st.stop()
 
-
-    # Restaurant name
-
+    # Name
     df["name"] = (
         df["name"]
         .astype(str)
         .str.strip()
     )
 
-
     # Location
-
     df["location"] = (
         df["location"]
         .astype(str)
         .str.strip()
     )
 
-
     # Cost
-
     df["approx_cost"] = (
         df["approx_cost"]
         .astype(str)
         .str.replace(",", "", regex=False)
     )
 
-
     df["approx_cost"] = pd.to_numeric(
         df["approx_cost"],
         errors="coerce"
     )
 
-
     # Votes
-
     df["votes"] = pd.to_numeric(
         df["votes"],
         errors="coerce"
-    )
-
-    df["votes"] = df["votes"].fillna(0)
-
+    ).fillna(0)
 
     # Rating
-
     df["rating"] = (
         df["rate"]
         .astype(str)
@@ -354,15 +369,12 @@ def load_data():
         )
     )
 
-
     df["rating"] = pd.to_numeric(
         df["rating"],
         errors="coerce"
     )
 
-
-    # Remove invalid data
-
+    # Remove invalid rows
     df = df.dropna(
         subset=[
             "name",
@@ -372,34 +384,23 @@ def load_data():
         ]
     )
 
-
-    # Valid rating
-
     df = df[
         (df["rating"] >= 0) &
         (df["rating"] <= 5)
     ]
 
-
-    # Valid cost
-
     df = df[
         df["approx_cost"] >= 0
     ]
 
-
     return df
 
-
-# =========================================================
-# DATA
-# =========================================================
 
 df = load_data()
 
 
 # =========================================================
-# SIDEBAR
+# SIDEBAR FILTERS
 # =========================================================
 
 st.sidebar.markdown(
@@ -407,23 +408,19 @@ st.sidebar.markdown(
 )
 
 st.sidebar.caption(
-    "Use filters to explore restaurant performance."
+    "Use filters to explore restaurant data."
 )
 
 st.sidebar.divider()
 
 
-# =========================================================
-# LOCATION
-# =========================================================
+# Location
 
 locations = sorted(
     df["location"]
-    .dropna()
     .unique()
     .tolist()
 )
-
 
 selected_location = st.sidebar.selectbox(
     "📍 Select Location",
@@ -431,44 +428,37 @@ selected_location = st.sidebar.selectbox(
 )
 
 
-# =========================================================
-# RATING
-# =========================================================
+# Rating
 
 min_rating = st.sidebar.slider(
     "⭐ Minimum Rating",
-    min_value=1.0,
-    max_value=5.0,
-    value=3.0,
-    step=0.1
+    1.0,
+    5.0,
+    3.0,
+    0.1
 )
 
 
-# =========================================================
-# COST
-# =========================================================
+# Cost
 
 maximum_cost = int(
     df["approx_cost"].max()
 )
 
-
 selected_max_cost = st.sidebar.slider(
     "💰 Maximum Cost",
-    min_value=0,
-    max_value=maximum_cost,
-    value=maximum_cost,
-    step=100
+    0,
+    maximum_cost,
+    maximum_cost,
+    100
 )
 
 
-# =========================================================
-# ONLINE ORDER
-# =========================================================
+# Online order
 
 if "online_order" in df.columns:
 
-    online_values = sorted(
+    online_options = sorted(
         df["online_order"]
         .dropna()
         .astype(str)
@@ -478,7 +468,7 @@ if "online_order" in df.columns:
 
     selected_online = st.sidebar.selectbox(
         "🛵 Online Order",
-        ["All"] + online_values
+        ["All"] + online_options
     )
 
 else:
@@ -486,13 +476,11 @@ else:
     selected_online = "All"
 
 
-# =========================================================
-# TABLE BOOKING
-# =========================================================
+# Table booking
 
 if "book_table" in df.columns:
 
-    table_values = sorted(
+    booking_options = sorted(
         df["book_table"]
         .dropna()
         .astype(str)
@@ -500,18 +488,18 @@ if "book_table" in df.columns:
         .tolist()
     )
 
-    selected_table = st.sidebar.selectbox(
+    selected_booking = st.sidebar.selectbox(
         "🍽️ Table Booking",
-        ["All"] + table_values
+        ["All"] + booking_options
     )
 
 else:
 
-    selected_table = "All"
+    selected_booking = "All"
 
 
 # =========================================================
-# APPLY FILTERS
+# FILTER DATA
 # =========================================================
 
 filtered_df = df.copy()
@@ -550,13 +538,13 @@ if (
 
 if (
     "book_table" in filtered_df.columns
-    and selected_table != "All"
+    and selected_booking != "All"
 ):
 
     filtered_df = filtered_df[
         filtered_df["book_table"]
         .astype(str)
-        == selected_table
+        == selected_booking
     ]
 
 
@@ -567,7 +555,7 @@ if (
 if filtered_df.empty:
 
     st.warning(
-        "⚠️ Current filters ke according koi data nahi mila."
+        "⚠️ No restaurants found for selected filters."
     )
 
     st.stop()
@@ -578,16 +566,20 @@ if filtered_df.empty:
 # =========================================================
 
 st.markdown(
-    '<div class="zomato-title">'
-    '🍽️ ZOMATO RESTAURANT ANALYTICS'
-    '</div>',
+    """
+    <div class="zomato-title">
+        🍽️ ZOMATO RESTAURANT ANALYTICS
+    </div>
+    """,
     unsafe_allow_html=True
 )
 
 st.markdown(
-    '<div class="zomato-subtitle">'
-    'Restaurant Ratings • Pricing • Popularity • Customer Analysis'
-    '</div>',
+    """
+    <div class="zomato-subtitle">
+        Restaurant Ratings • Pricing • Popularity • Customer Analysis
+    </div>
+    """,
     unsafe_allow_html=True
 )
 
@@ -595,10 +587,12 @@ st.divider()
 
 
 # =========================================================
-# KPI CALCULATIONS
+# KPI
 # =========================================================
 
-total_restaurants = len(filtered_df)
+total_restaurants = len(
+    filtered_df
+)
 
 average_rating = (
     filtered_df["rating"].mean()
@@ -613,21 +607,15 @@ average_cost = (
 )
 
 
-# =========================================================
-# KPI TITLE
-# =========================================================
-
 st.markdown(
-    '<div class="section-title">'
-    '📊 Key Performance Indicators'
-    '</div>',
+    """
+    <div class="section-title">
+        📊 Key Performance Indicators
+    </div>
+    """,
     unsafe_allow_html=True
 )
 
-
-# =========================================================
-# KPI ROW
-# =========================================================
 
 k1, k2, k3, k4 = st.columns(
     4,
@@ -668,12 +656,12 @@ with k4:
 
 
 # =========================================================
-# FILTER SUMMARY
+# SUMMARY
 # =========================================================
 
 st.markdown(
     f"""
-    <div class="small-info">
+    <div class="filter-summary">
         📍 {selected_location}
         &nbsp; • &nbsp;
         ⭐ Rating ≥ {min_rating:.1f}
@@ -692,9 +680,11 @@ st.markdown(
 # =========================================================
 
 st.markdown(
-    '<div class="section-title">'
-    '📈 Restaurant Performance Analysis'
-    '</div>',
+    """
+    <div class="section-title">
+        📈 Restaurant Performance Analysis
+    </div>
+    """,
     unsafe_allow_html=True
 )
 
@@ -703,17 +693,17 @@ st.markdown(
 # CHART 1 + CHART 2
 # =========================================================
 
-col1, col2 = st.columns(
+c1, c2 = st.columns(
     2,
     gap="small"
 )
 
 
 # =========================================================
-# LOCATION COST
+# CHART 1
 # =========================================================
 
-with col1:
+with c1:
 
     location_cost = (
         filtered_df
@@ -722,10 +712,9 @@ with col1:
         .sort_values(
             ascending=False
         )
-        .head(7)
+        .head(6)
         .reset_index()
     )
-
 
     fig1 = px.bar(
         location_cost,
@@ -734,34 +723,39 @@ with col1:
         orientation="h",
         color="approx_cost",
         color_continuous_scale=[
-            "#7f1d1d",
+            "#8b1e25",
             "#e23744",
             "#ff6b6b"
         ],
         template="plotly_dark",
         labels={
-            "approx_cost": "Avg Cost ₹",
+            "approx_cost": "Cost ₹",
             "location": ""
         }
     )
 
-
     fig1.update_layout(
-        height=205,
+        title={
+            "text": "💰 Top Locations by Cost",
+            "font": {
+                "size": 12,
+                "color": "white"
+            }
+        },
+        height=145,
         margin=dict(
             l=5,
             r=5,
-            t=5,
+            t=30,
             b=5
         ),
         coloraxis_showscale=False,
         plot_bgcolor="#11161d",
         paper_bgcolor="#11161d",
         font=dict(
-            size=9
+            size=8
         )
     )
-
 
     st.plotly_chart(
         fig1,
@@ -773,41 +767,43 @@ with col1:
 
 
 # =========================================================
-# RATING DISTRIBUTION
+# CHART 2
 # =========================================================
 
-with col2:
+with c2:
 
     fig2 = px.histogram(
         filtered_df,
         x="rating",
-        nbins=12,
+        nbins=10,
         color_discrete_sequence=[
             "#e23744"
         ],
-        template="plotly_dark",
-        labels={
-            "rating": "Rating"
-        }
+        template="plotly_dark"
     )
 
-
     fig2.update_layout(
-        height=205,
+        title={
+            "text": "⭐ Rating Distribution",
+            "font": {
+                "size": 12,
+                "color": "white"
+            }
+        },
+        height=145,
         margin=dict(
             l=5,
             r=5,
-            t=5,
+            t=30,
             b=5
         ),
         plot_bgcolor="#11161d",
         paper_bgcolor="#11161d",
         font=dict(
-            size=9
+            size=8
         ),
         bargap=0.08
     )
-
 
     st.plotly_chart(
         fig2,
@@ -822,17 +818,17 @@ with col2:
 # CHART 3 + CHART 4
 # =========================================================
 
-col3, col4 = st.columns(
+c3, c4 = st.columns(
     2,
     gap="small"
 )
 
 
 # =========================================================
-# MOST POPULAR
+# CHART 3
 # =========================================================
 
-with col3:
+with c3:
 
     popular = (
         filtered_df
@@ -841,10 +837,9 @@ with col3:
         .sort_values(
             ascending=False
         )
-        .head(7)
+        .head(6)
         .reset_index()
     )
-
 
     fig3 = px.bar(
         popular,
@@ -853,8 +848,8 @@ with col3:
         orientation="h",
         color="votes",
         color_continuous_scale=[
-            "#78350f",
-            "#f97316",
+            "#7c2d12",
+            "#ea580c",
             "#fb923c"
         ],
         template="plotly_dark",
@@ -864,23 +859,28 @@ with col3:
         }
     )
 
-
     fig3.update_layout(
-        height=205,
+        title={
+            "text": "🔥 Most Popular Restaurants",
+            "font": {
+                "size": 12,
+                "color": "white"
+            }
+        },
+        height=145,
         margin=dict(
             l=5,
             r=5,
-            t=5,
+            t=30,
             b=5
         ),
         coloraxis_showscale=False,
         plot_bgcolor="#11161d",
         paper_bgcolor="#11161d",
         font=dict(
-            size=9
+            size=8
         )
     )
-
 
     st.plotly_chart(
         fig3,
@@ -892,10 +892,10 @@ with col3:
 
 
 # =========================================================
-# COST VS RATING
+# CHART 4
 # =========================================================
 
-with col4:
+with c4:
 
     scatter_df = filtered_df[
         [
@@ -907,16 +907,13 @@ with col4:
     ].copy()
 
 
-    # Limit points for faster and cleaner display
+    # Limit points
 
-    if len(scatter_df) > 1200:
+    if len(scatter_df) > 900:
 
-        scatter_df = (
-            scatter_df
-            .sample(
-                1200,
-                random_state=42
-            )
+        scatter_df = scatter_df.sample(
+            900,
+            random_state=42
         )
 
 
@@ -939,22 +936,27 @@ with col4:
         }
     )
 
-
     fig4.update_layout(
-        height=205,
+        title={
+            "text": "💰 Cost vs Rating",
+            "font": {
+                "size": 12,
+                "color": "white"
+            }
+        },
+        height=145,
         margin=dict(
             l=5,
             r=5,
-            t=5,
+            t=30,
             b=5
         ),
         plot_bgcolor="#11161d",
         paper_bgcolor="#11161d",
         font=dict(
-            size=9
+            size=8
         )
     )
-
 
     st.plotly_chart(
         fig4,
@@ -966,21 +968,19 @@ with col4:
 
 
 # =========================================================
-# BOTTOM SUMMARY
+# BOTTOM LINE
 # =========================================================
 
 st.markdown(
     f"""
-    <div class="small-info">
+    <div class="filter-summary">
         🍽️ Zomato Restaurant Analytics
         &nbsp; | &nbsp;
         Dataset: {len(df):,} rows
         &nbsp; | &nbsp;
-        Filtered: {len(filtered_df):,}
+        Showing: {len(filtered_df):,}
         &nbsp; | &nbsp;
         Locations: {df["location"].nunique()}
-        &nbsp; | &nbsp;
-        Restaurants: {df["name"].nunique():,}
     </div>
     """,
     unsafe_allow_html=True
